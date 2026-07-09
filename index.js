@@ -324,6 +324,10 @@ app.get("/:config/manifest.json", (req, res) => {
   })
 })
 
+app.get('/', (req, res) => {
+  res.redirect('/configure')
+})
+
 app.get("/configure", (req, res) => {
   ReadManifest().then((manif) => {
     res.render('config', {
