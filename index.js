@@ -23,8 +23,8 @@ function ReadManifest() {
     let manifest = {
       "id": 'com.' + packageJSON.name.replaceAll('-', '.'),
       "version": packageJSON.version,
-      "name": "JKTioAnimeFLVAV1Jara",
-      "logo": "https://play-lh.googleusercontent.com/ZIjIwO5FJe9R1rplSd4uz54OwBxQhwDcznjljSPl2MgHaCoyF3qG6R4kRMCB40f4l2A=w256",
+      "name": "AnimES",
+      "logo": "https://raw.githubusercontent.com/Pigamer37/animeflv-stremio-addon/refs/heads/main/views/AnimES.png",
       "background": "https://images6.alphacoders.com/113/1135890.jpg",
       "description": packageJSON.description,
       "catalogs": [
