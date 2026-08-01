@@ -47,7 +47,7 @@ jobs:
         username: ${{ vars.USERNAME }}
         server: ${{ vars.SSHSERVER }}
         port: ${{ vars.PORT }}
-        remote_path: ${{ vars.DEST_FOLDER }}
+        #remote_path: ${{ vars.DEST_FOLDER }}
         #sftp_only: true
         password: ${{secrets.sshpassword}}
         uploads: ${{ vars.FOLDERS }}
