@@ -136,6 +136,10 @@ exports.GetItemStreams = async function (slug, onlyInternal = true, epNumber = 1
     if (!data) throw Error('Empty response!')
     return { data }
   }).then((data) => {
+
+    console.log("SERVIDORES JKANIME:");
+console.log(JSON.stringify(data, null, 2));
+
     return streamParser.GetStreamLinks("JKAnime", "jkanime", data, onlyInternal)
   })
 }
