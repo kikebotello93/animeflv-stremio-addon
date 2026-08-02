@@ -403,15 +403,28 @@ async function SearchAnimesBySpecificURL(jkanimeURL) {
 }
 
 async function GetOnAir() {
-  return SearchAnimesBySpecificURL(`${JKANIME_BASE}/directorio?estado=emision`).then((data) => {
+  const media = [];
+  const seenSlugs = new Set();
+  let nextPageUrl = `${JKANIME_BASE}/directorio?estado=emision`;
+
+  while (nextPageUrl) {
+    const data = await SearchAnimesBySpecificURL(nextPageUrl);
     if (!data || data.media === undefined) throw Error("Invalid response!")
-    return data.media.map((anime) => {
-      return {
+
+    data.media.forEach((anime) => {
+      if (!anime?.slug || seenSlugs.has(anime.slug)) return;
+
+      seenSlugs.add(anime.slug);
+      media.push({
         title: anime.title,
         type: anime.type,
         slug: anime.slug,
         url: anime.url
-      }
-    })
-  })
+      });
+    });
+
+    nextPageUrl = data.nextPage || null;
+  }
+
+  return media;
 }
