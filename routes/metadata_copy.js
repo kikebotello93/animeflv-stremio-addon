@@ -118,6 +118,72 @@ class Metadata {
       })
     })
   }
+
+  /**
+   * Retrieves all seasons and episodes for a TMDB TV series and returns them in a flat ordered array.
+   * Each entry contains the absolute episode number across the whole show, the season number, and the episode number.
+   * @param {String|Number} tmdbID - TMDB TV series ID
+   * @param {String} [lang=undefined] - optional language code for query
+   * @returns {Promise<Array<{absoluteEpisode: number, season: number, episode: number}>>}
+   */
+  static GetTMDBSeasonEpisodeMap(tmdbID, lang = undefined) {
+    const reqURL = (lang === undefined) ?
+      `${TMDB_API_BASE}/tv/${tmdbID}` :
+      `${TMDB_API_BASE}/tv/${tmdbID}?language=${lang}`;
+    const options = { headers: GetTMDBAuthToken() }
+
+    return new Promise((resolve, reject) => {
+      fetch(reqURL, options).then((resp) => {
+        if ((!resp.ok) || resp.status !== 200) reject(new Error(`HTTP error! Status: ${resp.status}`))
+        if (resp === undefined) reject(new Error("Undefined response!"))
+        return resp.json()
+      }).then((data) => {
+        if ((data === undefined)) reject(new Error("Invalid response!"))
+
+        const seasons = Array.isArray(data?.seasons) ? data.seasons : [];
+        const seasonNumbers = seasons
+          .map((season) => season?.season_number)
+          .filter((seasonNumber) => Number.isInteger(seasonNumber))
+          .sort((a, b) => a - b);
+
+        const seasonRequests = seasonNumbers.map((seasonNumber) => {
+          const seasonReqURL = (lang === undefined) ?
+            `${TMDB_API_BASE}/tv/${tmdbID}/season/${seasonNumber}` :
+            `${TMDB_API_BASE}/tv/${tmdbID}/season/${seasonNumber}?language=${lang}`;
+
+          return fetch(seasonReqURL, options).then((resp) => {
+            if ((!resp.ok) || resp.status !== 200) throw new Error(`HTTP error! Status: ${resp.status}`)
+            if (resp === undefined) throw new Error("Undefined response!")
+            return resp.json()
+          }).then((seasonData) => {
+            const episodes = Array.isArray(seasonData?.episodes) ? seasonData.episodes : [];
+            return episodes.map((episode) => ({
+              season: seasonNumber,
+              episode: episode?.episode_number
+            }));
+          });
+        });
+
+        return Promise.all(seasonRequests).then((seasonEpisodeArrays) => {
+          const ordered = [];
+          let absoluteEpisode = 1;
+
+          seasonEpisodeArrays.flat().forEach((entry) => {
+            ordered.push({
+              absoluteEpisode,
+              season: entry.season,
+              episode: entry.episode
+            });
+            absoluteEpisode += 1;
+          });
+
+          resolve(ordered);
+        });
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  }
   /**
    * Parses TMDB metadata to standardize in this app
    * @param {Array} resultsArray - movie_results array from JSON TMDB response

@@ -81,11 +81,13 @@ exports.GetAnimeBySlug = async function (slug) {
     const matches = imgPattern.exec(data.data.cover)
     const videos = data.data.episodes.map((ep) => {
       let d = new Date(Date.now())
+      const season = Math.floor((ep.number - 1) / 100) + 1
+      const episode = ((ep.number - 1) % 100) + 1
       return {
         id: `jkanime:${slug}:${ep.number}`,
         title: data.data.title + " Ep. " + ep.number,
-        season: 1,
-        episode: ep.number,
+        season,
+        episode,
         number: ep.number,
         thumbnail: ep.thumbnail,
         released: new Date(d.setDate(d.getDate() - (epCount - ep.number))),
