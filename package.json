@@ -31,7 +31,8 @@
     "dotenv": "^16.5.0",
     "ejs": "^6.0.1",
     "express": "^4.21.1",
-    "fuzzysort": "^3.1.0"
+    "fuzzysort": "^3.1.0",
+    "playwright": "^1.62.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
